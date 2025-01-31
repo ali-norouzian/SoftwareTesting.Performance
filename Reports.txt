@@ -1,0 +1,66 @@
+scenario: Insert in sqlserver without queue. result=114
+  - ok count: 24188
+  - fail count: 0
+  - all data: 0 MB
+  - duration: 00:01:00
+
+load simulations:
+  - inject, rate: 1000, interval: 00:00:01, during: 00:01:00
+
+┌────────────────────┬─────────────────────────────────────────────────────────────┐
+│               step │ ok stats                                                    │
+├────────────────────┼─────────────────────────────────────────────────────────────┤
+│               name │ global information                                          │
+│      request count │ all = 24188, ok = 24188, RPS = 403.1                        │
+│            latency │ min = 591.09, mean = 1779.56, max = 6099.6, StdDev = 856.35 │
+│ latency percentile │ p50 = 1423.36, p75 = 1983.49, p95 = 3923.97, p99 = 5124.1   │
+└────────────────────┴─────────────────────────────────────────────────────────────┘
+
+
+
+scenario: Insert in sqlserver without queue. result=23
+  - ok count: 27514
+  - fail count: 0
+  - all data: 0 MB
+  - duration: 00:01:00
+
+load simulations:
+  - inject, rate: 1000, interval: 00:00:01, during: 00:01:00
+
+┌────────────────────┬──────────────────────────────────────────────────────────────┐
+│               step │ ok stats                                                     │
+├────────────────────┼──────────────────────────────────────────────────────────────┤
+│               name │ global information                                           │
+│      request count │ all = 27514, ok = 27514, RPS = 458.6                         │
+│            latency │ min = 415.83, mean = 1573.71, max = 3144.15, StdDev = 410.22 │
+│ latency percentile │ p50 = 1318.91, p75 = 1975.3, p95 = 2103.3, p99 = 2314.24     │
+└────────────────────┴──────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+scenario: Mongo without queue result=89892
+  - ok count: 59988
+  - fail count: 0
+  - all data: 0 MB
+  - duration: 00:01:00
+
+load simulations:
+  - inject, rate: 1000, interval: 00:00:01, during: 00:01:00
+
+┌────────────────────┬─────────────────────────────────────────────────────┐
+│               step │ ok stats                                            │
+├────────────────────┼─────────────────────────────────────────────────────┤
+│               name │ global information                                  │
+│      request count │ all = 59988, ok = 59988, RPS = 999.8                │
+│            latency │ min = 0.73, mean = 2.62, max = 36.97, StdDev = 1.19 │
+│ latency percentile │ p50 = 2.32, p75 = 3.02, p95 = 4.53, p99 = 6.54      │
+└────────────────────┴─────────────────────────────────────────────────────┘
