@@ -42,23 +42,38 @@ namespace RequestReceiver
         {
             await using (var context = new AppDbContext())
             {
-                var counter = await context.Counters.FirstOrDefaultAsync(c => c.Id == 1);
-                if (counter != null)
+                await using (var transaction = await context.Database.BeginTransactionAsync())
                 {
-                    counter.Value += 1;
-                    await context.SaveChangesAsync();
+                    try
+                    {
+                        var counter = await context.Counters.FirstOrDefaultAsync(c => c.Id == 1);
+                        //if (counter != null)
+                        //{
+                        counter.Value += 1;
+                        await context.SaveChangesAsync();
+                        //}
+
+                        // Commit transaction
+                        await transaction.CommitAsync();
+
+                    }
+                    catch (Exception)
+                    {
+                        // Rollback transaction if any error occurs
+                        await transaction.RollbackAsync();
+                    }
+
                 }
             }
         }
 
         public static async Task IncreaseOneMongoAsync()
         {
-
             using var client = new MongoClient("mongodb://admin:admin@localhost:27017");
             var database = client.GetDatabase("TestDB");
             var collection = database.GetCollection<MongoCounter>("counters");
 
-            var filter = Builders<MongoCounter>.Filter.Eq("_id", ObjectId.Parse("679d30e97aef216f24950d8b"));
+            var filter = Builders<MongoCounter>.Filter.Eq("_id", ObjectId.Parse("679fa3ba1a57cb1794c259c5"));
             var update = Builders<MongoCounter>.Update.Inc(c => c.Value, 1);
 
             await collection.UpdateOneAsync(filter, update);

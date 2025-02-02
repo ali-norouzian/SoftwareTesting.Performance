@@ -14,37 +14,41 @@ class Consumer
         //Console.WriteLine("Prometheus metrics available at http://localhost:8080/metrics");
 
         var factory = new ConnectionFactory() { HostName = "localhost" };
-        await using (var connection = await factory.CreateConnectionAsync())
-        await using (var channel = await connection.CreateChannelAsync())
+        var connection = await factory.CreateConnectionAsync();
+        var channel = await connection.CreateChannelAsync();
+
+        await channel.QueueDeclareAsync(queue: "test_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+        var consumer = new AsyncEventingBasicConsumer(channel);
+        consumer.ReceivedAsync += async (model, ea) =>
         {
-            await channel.QueueDeclareAsync(queue: "test_queue", durable: false, exclusive: false, autoDelete: false, arguments: null);
+            //var stopwatch = Stopwatch.StartNew();
 
-            var consumer = new AsyncEventingBasicConsumer(channel);
-            consumer.ReceivedAsync += async (model, ea) =>
-            {
-                //var stopwatch = Stopwatch.StartNew();
+            //var body = ea.Body.ToArray();
+            //var message = Encoding.UTF8.GetString(body);
+            //Console.WriteLine($"[x] Received {message}");
 
-                //var body = ea.Body.ToArray();
-                //var message = Encoding.UTF8.GetString(body);
-                //Console.WriteLine($"[x] Received {message}");
+            await Data.IncreaseOneSqlAsync();
 
-                await Data.IncreaseOneMongoAsync();
+            // Simulating message processing delay
+            //System.Threading.Thread.Sleep(50);
 
-                // Simulating message processing delay
-                //System.Threading.Thread.Sleep(50);
+            //stopwatch.Stop();
+            //ProcessingTime.Observe(stopwatch.ElapsedMilliseconds);
+            //MessageCounter.Inc();
+        };
 
-                //stopwatch.Stop();
-                //ProcessingTime.Observe(stopwatch.ElapsedMilliseconds);
-                //MessageCounter.Inc();
-            };
+        await channel.BasicConsumeAsync(queue: "test_queue", autoAck: true, consumer: consumer);
 
-            await channel.BasicConsumeAsync(queue: "test_queue", autoAck: true, consumer: consumer);
+        Console.WriteLine("Press [enter] to exit.");
+        Console.ReadLine();
 
-            Console.WriteLine("Press [enter] to exit.");
-            Console.ReadLine();
-        }
+        await channel.CloseAsync();
+        await connection.CloseAsync();
+
     }
 }
+
 
 
 
